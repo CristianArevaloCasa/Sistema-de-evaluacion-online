@@ -1,0 +1,115 @@
+<div class="evaluaciones-container">
+  <header class="header">
+    <div class="header-content">
+      <h1>Mis Evaluaciones</h1>
+      <div class="user-info">
+        <span>Hola, {{ userName }}</span>
+        <button class="btn btn-secondary" (click)="logout()">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- Barra de herramientas -->
+    <div class="toolbar">
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por título, descripción o categoría..."
+          class="search-input"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <div class="filters">
+        <select [(ngModel)]="filtroEstado" (ngModelChange)="onEstadoChange()" class="filter-select">
+          <option value="">Todos los estados</option>
+          <option value="activa">Activa</option>
+          <option value="borrador">Borrador</option>
+          <option value="cerrada">Cerrada</option>
+        </select>
+
+        <select [(ngModel)]="filtroCategoria" (ngModelChange)="onCategoriaChange()" class="filter-select">
+          <option value="">Todas las categorías</option>
+          <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+        </select>
+
+        <button class="btn btn-link" (click)="limpiarFiltros()" *ngIf="searchTerm || filtroEstado || filtroCategoria">
+          Limpiar filtros
+        </button>
+      </div>
+
+      <button class="btn btn-primary" (click)="crearNuevaEvaluacion()">
+        ➕ Nueva Evaluación
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <p>Cargando evaluaciones...</p>
+    </div>
+
+    <!-- Lista vacía -->
+    <div *ngIf="!loading && evaluacionesFiltradas.length === 0" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h2>{{ searchTerm || filtroEstado || filtroCategoria ? 'No se encontraron evaluaciones' : 'No tienes evaluaciones aún' }}</h2>
+      <p>{{ searchTerm || filtroEstado || filtroCategoria ? 'Intenta con otros criterios de búsqueda' : 'Comienza creando tu primera evaluación' }}</p>
+      <button *ngIf="!searchTerm && !filtroEstado && !filtroCategoria" class="btn btn-primary" (click)="crearNuevaEvaluacion()">
+        Crear Primera Evaluación
+      </button>
+    </div>
+
+    <!-- Lista de evaluaciones -->
+    <div *ngIf="!loading && evaluacionesFiltradas.length > 0" class="evaluaciones-grid">
+      <div *ngFor="let evaluacion of evaluacionesFiltradas" class="evaluacion-card">
+        <div class="card-header">
+          <h3>{{ evaluacion.titulo }}</h3>
+          <span class="estado-badge" [ngClass]="getEstadoClass(evaluacion.estado)">
+            {{ evaluacion.estado }}
+          </span>
+        </div>
+
+        <div class="card-body">
+          <p class="descripcion">{{ evaluacion.descripcion }}</p>
+          
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Categoría:</span>
+              <span class="info-value">{{ evaluacion.categoria }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Puntaje máximo:</span>
+              <span class="info-value">{{ evaluacion.puntajeMaximo }} pts</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Fecha creación:</span>
+              <span class="info-value">{{ formatearFecha(evaluacion.fechaCreacion) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Fecha límite:</span>
+              <span class="info-value">{{ formatearFecha(evaluacion.fechaLimite) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Preguntas:</span>
+              <span class="info-value">{{ evaluacion.preguntas?.length || 0 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-small btn-info" (click)="verEstadisticas(evaluacion.id)">
+            📊 Estadísticas
+          </button>
+          <button class="btn btn-small btn-secondary" (click)="editarEvaluacion(evaluacion.id)">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-small btn-danger" (click)="eliminarEvaluacion(evaluacion)">
+            🗑️ Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

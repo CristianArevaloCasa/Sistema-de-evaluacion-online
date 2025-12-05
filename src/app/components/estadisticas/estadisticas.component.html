@@ -1,0 +1,150 @@
+<div class="estadisticas-container">
+  <div class="header">
+    <div class="header-content">
+      <h1>Estadísticas de Evaluación</h1>
+      <button class="btn btn-secondary" (click)="volver()">← Volver a Evaluaciones</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <p>Cargando estadísticas...</p>
+    </div>
+
+    <!-- Contenido -->
+    <div *ngIf="!loading && evaluacion">
+      <!-- Información de la evaluación -->
+      <div class="info-card">
+        <h2>{{ evaluacion.titulo }}</h2>
+        <p class="descripcion">{{ evaluacion.descripcion }}</p>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Categoría:</span>
+            <span class="info-value">{{ evaluacion.categoria }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Estado:</span>
+            <span class="info-value badge" [ngClass]="'estado-' + evaluacion.estado">{{ evaluacion.estado }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Fecha límite:</span>
+            <span class="info-value">{{ formatearFecha(evaluacion.fechaLimite) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Puntaje máximo:</span>
+            <span class="info-value">{{ evaluacion.puntajeMaximo }} puntos</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Total preguntas:</span>
+            <span class="info-value">{{ evaluacion.preguntas?.length || 0 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sin respuestas -->
+      <div *ngIf="!estadisticas" class="empty-state">
+        <div class="empty-icon">📊</div>
+        <h2>No hay respuestas registradas</h2>
+        <p>Aún no hay estudiantes que hayan completado esta evaluación.</p>
+      </div>
+
+      <!-- Estadísticas -->
+      <div *ngIf="estadisticas" class="estadisticas-grid">
+        <!-- Resumen General -->
+        <div class="stats-card">
+          <h3>📈 Resumen General</h3>
+          <div class="stats-list">
+            <div class="stat-item">
+              <span class="stat-label">Total de respuestas:</span>
+              <span class="stat-value highlight">{{ estadisticas.totalRespuestas }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Promedio general:</span>
+              <span class="stat-value highlight">{{ redondear(estadisticas.promedioGeneral) }} / {{ evaluacion.puntajeMaximo }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Puntaje más alto:</span>
+              <span class="stat-value success">{{ redondear(estadisticas.puntajeMaximo) }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Puntaje más bajo:</span>
+              <span class="stat-value danger">{{ redondear(estadisticas.puntajeMinimo) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aprobación -->
+        <div class="stats-card">
+          <h3>✓ Aprobación</h3>
+          <div class="stats-list">
+            <div class="stat-item">
+              <span class="stat-label">Aprobados:</span>
+              <span class="stat-value success">{{ estadisticas.aprobados }} ({{ redondear(estadisticas.porcentajeAprobacion) }}%)</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Reprobados:</span>
+              <span class="stat-value danger">{{ estadisticas.reprobados }} ({{ redondear(100 - estadisticas.porcentajeAprobacion) }}%)</span>
+            </div>
+          </div>
+          
+          <div class="progress-bar">
+            <div class="progress-fill success" [style.width]="estadisticas.porcentajeAprobacion + '%'"></div>
+            <div class="progress-fill danger" [style.width]="(100 - estadisticas.porcentajeAprobacion) + '%'"></div>
+          </div>
+        </div>
+
+        <!-- Distribución de Puntajes -->
+        <div class="stats-card full-width">
+          <h3>📊 Distribución de Puntajes</h3>
+          <div class="distribution-chart">
+            <div *ngFor="let dist of estadisticas.distribucionPuntajes" class="distribution-item">
+              <div class="distribution-header">
+                <span class="range-label">{{ dist.rango }} pts</span>
+                <span class="range-count">{{ dist.cantidad }} estudiantes</span>
+              </div>
+              <div class="distribution-bar">
+                <div class="bar-fill" [style.width]="getBarWidth(dist.cantidad)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Respuestas -->
+        <div class="stats-card full-width">
+          <h3>📝 Respuestas Individuales</h3>
+          <div class="respuestas-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Estudiante</th>
+                  <th>Fecha de Entrega</th>
+                  <th>Puntaje</th>
+                  <th>Estado</th>
+                  <th>Porcentaje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let respuesta of respuestas">
+                  <td>{{ respuesta.userName }}</td>
+                  <td>{{ formatearFecha(respuesta.fechaEntrega) }}</td>
+                  <td><strong>{{ redondear(respuesta.puntajeObtenido) }}</strong> / {{ evaluacion.puntajeMaximo }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="respuesta.estado === 'completada' ? 'estado-activa' : 'estado-borrador'">
+                      {{ respuesta.estado }}
+                    </span>
+                  </td>
+                  <td>
+                    <span [ngClass]="respuesta.puntajeObtenido >= (evaluacion.puntajeMaximo * 0.6) ? 'success' : 'danger'">
+                      {{ redondear((respuesta.puntajeObtenido / evaluacion.puntajeMaximo) * 100) }}%
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

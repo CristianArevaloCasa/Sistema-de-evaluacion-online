@@ -1,0 +1,196 @@
+<div class="form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Editar Evaluación' : 'Nueva Evaluación' }}</h1>
+    <button class="btn btn-secondary" (click)="cancelar()">← Volver</button>
+  </div>
+
+  <form [formGroup]="evaluacionForm" (ngSubmit)="onSubmit()" class="evaluacion-form">
+    <!-- Información general -->
+    <div class="form-section">
+      <h2>Información General</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="titulo">Título de la Evaluación *</label>
+          <input
+            type="text"
+            id="titulo"
+            formControlName="titulo"
+            placeholder="Ej: Examen de Matemáticas - Unidad 1"
+            [class.error]="evaluacionForm.get('titulo')?.invalid && evaluacionForm.get('titulo')?.touched"
+          />
+          <span class="error-message" *ngIf="evaluacionForm.get('titulo')?.invalid && evaluacionForm.get('titulo')?.touched">
+            El título debe tener al menos 3 caracteres
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="categoria">Categoría *</label>
+          <input
+            type="text"
+            id="categoria"
+            formControlName="categoria"
+            placeholder="Ej: Matemáticas, Historia, Ciencias"
+            [class.error]="evaluacionForm.get('categoria')?.invalid && evaluacionForm.get('categoria')?.touched"
+          />
+          <span class="error-message" *ngIf="evaluacionForm.get('categoria')?.invalid && evaluacionForm.get('categoria')?.touched">
+            La categoría es obligatoria
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="descripcion">Descripción *</label>
+        <textarea
+          id="descripcion"
+          formControlName="descripcion"
+          rows="3"
+          placeholder="Describe el contenido y objetivos de esta evaluación..."
+          [class.error]="evaluacionForm.get('descripcion')?.invalid && evaluacionForm.get('descripcion')?.touched"
+        ></textarea>
+        <span class="error-message" *ngIf="evaluacionForm.get('descripcion')?.invalid && evaluacionForm.get('descripcion')?.touched">
+          La descripción debe tener al menos 10 caracteres
+        </span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fechaLimite">Fecha y Hora Límite *</label>
+          <input
+            type="datetime-local"
+            id="fechaLimite"
+            formControlName="fechaLimite"
+            [class.error]="evaluacionForm.get('fechaLimite')?.invalid && evaluacionForm.get('fechaLimite')?.touched"
+          />
+          <span class="error-message" *ngIf="evaluacionForm.get('fechaLimite')?.invalid && evaluacionForm.get('fechaLimite')?.touched">
+            La fecha límite es obligatoria
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="estado">Estado *</label>
+          <select id="estado" formControlName="estado">
+            <option value="borrador">Borrador</option>
+            <option value="activa">Activa</option>
+            <option value="cerrada">Cerrada</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="puntajeMaximo">Puntaje Máximo</label>
+          <input
+            type="number"
+            id="puntajeMaximo"
+            formControlName="puntajeMaximo"
+            readonly
+            class="readonly-input"
+          />
+          <small>Se calcula automáticamente según las preguntas</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preguntas -->
+    <div class="form-section">
+      <div class="section-header">
+        <h2>Preguntas</h2>
+        <button type="button" class="btn btn-success" (click)="agregarPregunta()">
+          ➕ Agregar Pregunta
+        </button>
+      </div>
+
+      <div formArrayName="preguntas" class="preguntas-list">
+        <div *ngFor="let pregunta of preguntas.controls; let i = index" [formGroupName]="i" class="pregunta-card">
+          <div class="pregunta-header">
+            <h3>Pregunta {{ i + 1 }}</h3>
+            <button type="button" class="btn btn-danger btn-small" (click)="eliminarPregunta(i)" *ngIf="preguntas.length > 1">
+              🗑️ Eliminar
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label [for]="'texto-' + i">Texto de la Pregunta *</label>
+            <textarea
+              [id]="'texto-' + i"
+              formControlName="texto"
+              rows="2"
+              placeholder="Escribe la pregunta..."
+              [class.error]="pregunta.get('texto')?.invalid && pregunta.get('texto')?.touched"
+            ></textarea>
+            <span class="error-message" *ngIf="pregunta.get('texto')?.invalid && pregunta.get('texto')?.touched">
+              La pregunta debe tener al menos 5 caracteres
+            </span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label [for]="'tipo-' + i">Tipo de Pregunta *</label>
+              <select [id]="'tipo-' + i" formControlName="tipo">
+                <option value="opcion-multiple">Opción Múltiple</option>
+                <option value="verdadero-falso">Verdadero/Falso</option>
+                <option value="respuesta-corta">Respuesta Corta</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label [for]="'puntaje-' + i">Puntaje *</label>
+              <input
+                type="number"
+                [id]="'puntaje-' + i"
+                formControlName="puntaje"
+                step="0.5"
+                min="0.5"
+                (change)="onPuntajeChange()"
+                [class.error]="pregunta.get('puntaje')?.invalid && pregunta.get('puntaje')?.touched"
+              />
+            </div>
+          </div>
+
+          <div class="form-group" *ngIf="pregunta.get('tipo')?.value === 'opcion-multiple'">
+            <label [for]="'opciones-' + i">Opciones (una por línea) *</label>
+            <textarea
+              [id]="'opciones-' + i"
+              formControlName="opciones"
+              rows="4"
+              placeholder="Opción 1&#10;Opción 2&#10;Opción 3&#10;Opción 4"
+              [class.error]="pregunta.get('opciones')?.invalid && pregunta.get('opciones')?.touched"
+            ></textarea>
+            <span class="error-message" *ngIf="pregunta.get('opciones')?.invalid && pregunta.get('opciones')?.touched">
+              Debes agregar las opciones
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label [for]="'respuesta-' + i">Respuesta Correcta *</label>
+            <input
+              type="text"
+              [id]="'respuesta-' + i"
+              formControlName="respuestaCorrecta"
+              [placeholder]="pregunta.get('tipo')?.value === 'opcion-multiple' ? 'Escribe la opción correcta exactamente como aparece arriba' : 'Escribe la respuesta correcta'"
+              [class.error]="pregunta.get('respuestaCorrecta')?.invalid && pregunta.get('respuestaCorrecta')?.touched"
+            />
+            <span class="error-message" *ngIf="pregunta.get('respuestaCorrecta')?.invalid && pregunta.get('respuestaCorrecta')?.touched">
+              La respuesta correcta es obligatoria
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="preguntas.length === 0" class="empty-preguntas">
+          <p>No hay preguntas. Agrega al menos una pregunta.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensajes y acciones -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || evaluacionForm.invalid">
+        {{ loading ? 'Guardando...' : (isEditMode ? 'Actualizar Evaluación' : 'Crear Evaluación') }}
+      </button>
+    </div>
+  </form>
+</div>
