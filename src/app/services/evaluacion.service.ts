@@ -28,34 +28,40 @@ export class EvaluacionService {
   // Crear evaluación
   async crearEvaluacion(evaluacion: Evaluacion): Promise<string> {
     try {
+      console.log('💾 Guardando evaluación:', evaluacion);
       const evaluacionData = {
         ...evaluacion,
         fechaCreacion: Timestamp.fromDate(new Date(evaluacion.fechaCreacion)),
         fechaLimite: Timestamp.fromDate(new Date(evaluacion.fechaLimite))
       };
+      console.log('📤 Datos a guardar:', evaluacionData);
       const docRef = await addDoc(this.evaluacionesCollection, evaluacionData);
+      console.log('✅ Evaluación guardada con ID:', docRef.id);
       return docRef.id;
     } catch (error) {
-      console.error('Error al crear evaluación:', error);
+      console.error('❌ Error al crear evaluación:', error);
       throw error;
     }
   }
 
   // Obtener evaluaciones del usuario
   getEvaluacionesByUser(userId: string): Observable<Evaluacion[]> {
+    console.log('🔍 Buscando evaluaciones para userId:', userId);
     const q = query(
       this.evaluacionesCollection,
       where('userId', '==', userId),
       orderBy('fechaCreacion', 'desc')
     );
     return collectionData(q, { idField: 'id' }).pipe(
-      map((evaluaciones: any[]) => 
-        evaluaciones.map(e => ({
+      map((evaluaciones: any[]) => {
+        console.log('📦 Evaluaciones recibidas de Firestore:', evaluaciones.length);
+        console.log('📋 Datos:', evaluaciones);
+        return evaluaciones.map(e => ({
           ...e,
           fechaCreacion: e.fechaCreacion?.toDate(),
           fechaLimite: e.fechaLimite?.toDate()
-        }))
-      )
+        }));
+      })
     );
   }
 

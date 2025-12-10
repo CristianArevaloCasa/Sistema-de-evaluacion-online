@@ -33,13 +33,16 @@ export class EvaluacionesListComponent implements OnInit {
   cargarEvaluaciones() {
     const user = this.authService.getCurrentUser();
     if (!user) {
+      console.log('❌ No hay usuario autenticado');
       this.router.navigate(['/login']);
       return;
     }
 
+    console.log('👤 Usuario actual:', user.uid, user.email);
     this.loading = true;
     this.evaluacionService.getEvaluacionesByUser(user.uid).subscribe({
       next: (evaluaciones) => {
+        console.log('✅ Evaluaciones cargadas:', evaluaciones.length);
         this.evaluaciones = evaluaciones;
         this.evaluacionesFiltradas = evaluaciones;
         this.loading = false;
@@ -48,7 +51,8 @@ export class EvaluacionesListComponent implements OnInit {
         this.categorias = [...new Set(evaluaciones.map(e => e.categoria))];
       },
       error: (error) => {
-        console.error('Error al cargar evaluaciones:', error);
+        console.error('❌ Error al cargar evaluaciones:', error);
+        console.error('Detalles del error:', error.message);
         this.loading = false;
       }
     });
