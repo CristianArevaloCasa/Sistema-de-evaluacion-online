@@ -6,12 +6,13 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  collectionData,
-  docData,
+  getDocs,
+  getDoc,
   query,
   where,
   orderBy,
-  Timestamp
+  Timestamp,
+  onSnapshot
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -47,54 +48,95 @@ export class EvaluacionService {
   // Obtener evaluaciones del usuario
   getEvaluacionesByUser(userId: string): Observable<Evaluacion[]> {
     console.log('🔍 Buscando evaluaciones para userId:', userId);
-    const q = query(
-      this.evaluacionesCollection,
-      where('userId', '==', userId),
-      orderBy('fechaCreacion', 'desc')
-    );
-    return collectionData(q, { idField: 'id' }).pipe(
-      map((evaluaciones: any[]) => {
-        console.log('📦 Evaluaciones recibidas de Firestore:', evaluaciones.length);
-        console.log('📋 Datos:', evaluaciones);
-        return evaluaciones.map(e => ({
-          ...e,
-          fechaCreacion: e.fechaCreacion?.toDate(),
-          fechaLimite: e.fechaLimite?.toDate()
-        }));
-      })
-    );
+    return new Observable(observer => {
+      const q = query(
+        this.evaluacionesCollection,
+        where('userId', '==', userId),
+        orderBy('fechaCreacion', 'desc')
+      );
+      
+      const unsubscribe = onSnapshot(q, 
+        (snapshot) => {
+          console.log('📦 Evaluaciones recibidas:', snapshot.size);
+          const evaluaciones = snapshot.docs.map(doc => {
+            const data = doc.data() as any;
+            return {
+              id: doc.id,
+              ...data,
+              fechaCreacion: data.fechaCreacion?.toDate(),
+              fechaLimite: data.fechaLimite?.toDate()
+            } as Evaluacion;
+          });
+          console.log('📋 Datos procesados:', evaluaciones);
+          observer.next(evaluaciones);
+        },
+        (error) => {
+          console.error('❌ Error en snapshot:', error);
+          observer.error(error);
+        }
+      );
+      
+      return () => unsubscribe();
+    });
   }
 
   // Obtener todas las evaluaciones (para buscar/filtrar)
   getTodasEvaluaciones(): Observable<Evaluacion[]> {
-    const q = query(
-      this.evaluacionesCollection,
-      orderBy('fechaCreacion', 'desc')
-    );
-    return collectionData(q, { idField: 'id' }).pipe(
-      map((evaluaciones: any[]) => 
-        evaluaciones.map(e => ({
-          ...e,
-          fechaCreacion: e.fechaCreacion?.toDate(),
-          fechaLimite: e.fechaLimite?.toDate()
-        }))
-      )
-    );
+    return new Observable(observer => {
+      const q = query(
+        this.evaluacionesCollection,
+        orderBy('fechaCreacion', 'desc')
+      );
+      
+      const unsubscribe = onSnapshot(q,
+        (snapshot) => {
+          const evaluaciones = snapshot.docs.map(doc => {
+            const data = doc.data() as any;
+            return {
+              id: doc.id,
+              ...data,
+              fechaCreacion: data.fechaCreacion?.toDate(),
+              fechaLimite: data.fechaLimite?.toDate()
+            } as Evaluacion;
+          });
+          observer.next(evaluaciones);
+        },
+        (error) => {
+          observer.error(error);
+        }
+      );
+      
+      return () => unsubscribe();
+    });
   }
 
   // Obtener evaluación por ID
   getEvaluacionById(id: string): Observable<Evaluacion | undefined> {
-    const evaluacionDoc = doc(this.firestore, `evaluaciones/${id}`);
-    return docData(evaluacionDoc, { idField: 'id' }).pipe(
-      map((evaluacion: any) => {
-        if (!evaluacion) return undefined;
-        return {
-          ...evaluacion,
-          fechaCreacion: evaluacion.fechaCreacion?.toDate(),
-          fechaLimite: evaluacion.fechaLimite?.toDate()
-        };
-      })
-    );
+    return new Observable(observer => {
+      const evaluacionDoc = doc(this.firestore, `evaluaciones/${id}`);
+      
+      const unsubscribe = onSnapshot(evaluacionDoc,
+        (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data() as any;
+            const evaluacion: Evaluacion = {
+              id: docSnap.id,
+              ...data,
+              fechaCreacion: data.fechaCreacion?.toDate(),
+              fechaLimite: data.fechaLimite?.toDate()
+            };
+            observer.next(evaluacion);
+          } else {
+            observer.next(undefined);
+          }
+        },
+        (error) => {
+          observer.error(error);
+        }
+      );
+      
+      return () => unsubscribe();
+    });
   }
 
   // Actualizar evaluación
@@ -131,8 +173,8 @@ export class EvaluacionService {
   // Buscar evaluaciones por título o categoría
   buscarEvaluaciones(termino: string, userId: string): Observable<Evaluacion[]> {
     return this.getEvaluacionesByUser(userId).pipe(
-      map(evaluaciones => 
-        evaluaciones.filter(e => 
+      map((evaluaciones: Evaluacion[]) => 
+        evaluaciones.filter((e: Evaluacion) => 
           e.titulo.toLowerCase().includes(termino.toLowerCase()) ||
           e.categoria.toLowerCase().includes(termino.toLowerCase()) ||
           e.descripcion.toLowerCase().includes(termino.toLowerCase())
@@ -144,8 +186,8 @@ export class EvaluacionService {
   // Filtrar evaluaciones por estado
   filtrarPorEstado(estado: string, userId: string): Observable<Evaluacion[]> {
     return this.getEvaluacionesByUser(userId).pipe(
-      map(evaluaciones => 
-        evaluaciones.filter(e => e.estado === estado)
+      map((evaluaciones: Evaluacion[]) => 
+        evaluaciones.filter((e: Evaluacion) => e.estado === estado)
       )
     );
   }
@@ -153,8 +195,8 @@ export class EvaluacionService {
   // Filtrar evaluaciones por categoría
   filtrarPorCategoria(categoria: string, userId: string): Observable<Evaluacion[]> {
     return this.getEvaluacionesByUser(userId).pipe(
-      map(evaluaciones => 
-        evaluaciones.filter(e => e.categoria === categoria)
+      map((evaluaciones: Evaluacion[]) => 
+        evaluaciones.filter((e: Evaluacion) => e.categoria === categoria)
       )
     );
   }
@@ -176,18 +218,31 @@ export class EvaluacionService {
 
   // Obtener respuestas por evaluación
   getRespuestasByEvaluacion(evaluacionId: string): Observable<Respuesta[]> {
-    const q = query(
-      this.respuestasCollection,
-      where('evaluacionId', '==', evaluacionId),
-      orderBy('fechaEntrega', 'desc')
-    );
-    return collectionData(q, { idField: 'id' }).pipe(
-      map((respuestas: any[]) => 
-        respuestas.map(r => ({
-          ...r,
-          fechaEntrega: r.fechaEntrega?.toDate()
-        }))
-      )
-    );
+    return new Observable(observer => {
+      const q = query(
+        this.respuestasCollection,
+        where('evaluacionId', '==', evaluacionId),
+        orderBy('fechaEntrega', 'desc')
+      );
+      
+      const unsubscribe = onSnapshot(q,
+        (snapshot) => {
+          const respuestas = snapshot.docs.map(doc => {
+            const data = doc.data() as any;
+            return {
+              id: doc.id,
+              ...data,
+              fechaEntrega: data.fechaEntrega?.toDate()
+            } as Respuesta;
+          });
+          observer.next(respuestas);
+        },
+        (error) => {
+          observer.error(error);
+        }
+      );
+      
+      return () => unsubscribe();
+    });
   }
 }
