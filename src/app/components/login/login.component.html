@@ -24,6 +24,18 @@
     <!-- Formulario de Login -->
     <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
       <div class="form-group">
+        <label for="login-rol">Tipo de Usuario</label>
+        <select
+          id="login-rol"
+          formControlName="rol"
+          class="rol-select"
+        >
+          <option value="estudiante">👨‍🎓 Estudiante</option>
+          <option value="profesor">👨‍🏫 Profesor</option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="login-email">Correo Electrónico</label>
         <input
           type="email"
@@ -62,6 +74,18 @@
 
     <!-- Formulario de Registro -->
     <form *ngIf="!isLoginMode" [formGroup]="registerForm" (ngSubmit)="onRegister()" class="login-form">
+      <div class="form-group">
+        <label for="register-rol">Tipo de Usuario</label>
+        <select
+          id="register-rol"
+          formControlName="rol"
+          class="rol-select"
+        >
+          <option value="estudiante">👨‍🎓 Estudiante</option>
+          <option value="profesor">👨‍🏫 Profesor</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label for="register-name">Nombre Completo</label>
         <input

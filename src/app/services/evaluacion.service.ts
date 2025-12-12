@@ -110,6 +110,37 @@ export class EvaluacionService {
     });
   }
 
+  // Obtener evaluaciones activas (para estudiantes)
+  getEvaluacionesActivas(): Observable<Evaluacion[]> {
+    return new Observable(observer => {
+      const q = query(
+        this.evaluacionesCollection,
+        where('estado', '==', 'activa'),
+        orderBy('fechaCreacion', 'desc')
+      );
+      
+      const unsubscribe = onSnapshot(q,
+        (snapshot) => {
+          const evaluaciones = snapshot.docs.map(doc => {
+            const data = doc.data() as any;
+            return {
+              id: doc.id,
+              ...data,
+              fechaCreacion: data.fechaCreacion?.toDate(),
+              fechaLimite: data.fechaLimite?.toDate()
+            } as Evaluacion;
+          });
+          observer.next(evaluaciones);
+        },
+        (error) => {
+          observer.error(error);
+        }
+      );
+      
+      return () => unsubscribe();
+    });
+  }
+
   // Obtener evaluación por ID
   getEvaluacionById(id: string): Observable<Evaluacion | undefined> {
     return new Observable(observer => {

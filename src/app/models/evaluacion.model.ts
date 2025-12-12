@@ -14,7 +14,7 @@ export interface Evaluacion {
 export interface Pregunta {
   id: string;
   texto: string;
-  tipo: 'opcion-multiple' | 'verdadero-falso' | 'respuesta-corta';
+  tipo: 'opcion-multiple' | 'abierta' | 'verdadero-falso' | 'respuesta-corta';
   opciones?: string[];
   respuestaCorrecta: string | number;
   puntaje: number;

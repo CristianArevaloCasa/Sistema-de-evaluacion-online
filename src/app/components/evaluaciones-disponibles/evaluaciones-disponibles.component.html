@@ -1,0 +1,113 @@
+<div class="disponibles-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1>📚 Evaluaciones Disponibles</h1>
+        <p class="subtitle">Bienvenido, {{ currentUser?.email }}</p>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-logout" (click)="cerrarSesion()">
+          🚪 Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- Filtros -->
+    <div class="filtros-section animate-slide-down">
+      <div class="filtro-group">
+        <label for="busqueda">🔍 Buscar:</label>
+        <input 
+          type="text" 
+          id="busqueda"
+          [(ngModel)]="busqueda"
+          (input)="onBusquedaChange()"
+          placeholder="Buscar por título o descripción..."
+          class="input-busqueda">
+      </div>
+
+      <div class="filtro-group">
+        <label for="categoria">📂 Categoría:</label>
+        <select 
+          id="categoria"
+          [(ngModel)]="categoriaSeleccionada"
+          (change)="onCategoriaChange()"
+          class="select-categoria">
+          <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading">
+      <p>Cargando evaluaciones disponibles...</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!loading && errorMessage" class="alert alert-error animate-shake">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Sin Evaluaciones -->
+    <div *ngIf="!loading && evaluacionesFiltradas.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h2>No hay evaluaciones disponibles</h2>
+      <p>No se encontraron evaluaciones activas en este momento.</p>
+    </div>
+
+    <!-- Lista de Evaluaciones -->
+    <div *ngIf="!loading && evaluacionesFiltradas.length > 0" class="evaluaciones-grid">
+      <div *ngFor="let evaluacion of evaluacionesFiltradas; let i = index" 
+           class="evaluacion-card animate-fade-in"
+           [style.animation-delay]="(i * 0.1) + 's'">
+        
+        <div class="card-header">
+          <h3>{{ evaluacion.titulo }}</h3>
+          <span class="badge badge-categoria">{{ evaluacion.categoria }}</span>
+        </div>
+
+        <div class="card-body">
+          <p class="descripcion">{{ evaluacion.descripcion }}</p>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">📝 Preguntas:</span>
+              <span class="info-value">{{ evaluacion.preguntas.length }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">⭐ Puntaje Máximo:</span>
+              <span class="info-value">{{ evaluacion.puntajeMaximo }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">⏰ Tiempo Restante:</span>
+              <span class="info-value" 
+                    [class.tiempo-critico]="calcularTiempoRestante(evaluacion.fechaLimite).includes('m') && !calcularTiempoRestante(evaluacion.fechaLimite).includes('h')">
+                {{ calcularTiempoRestante(evaluacion.fechaLimite) }}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">📅 Fecha Límite:</span>
+              <span class="info-value">{{ evaluacion.fechaLimite.toLocaleString() }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <button class="btn btn-comenzar" (click)="comenzarEvaluacion(evaluacion.id!)">
+            ▶️ Comenzar Evaluación
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contador de Resultados -->
+    <div *ngIf="!loading && evaluaciones.length > 0" class="resultados-info">
+      Mostrando {{ evaluacionesFiltradas.length }} de {{ evaluaciones.length }} evaluaciones
+    </div>
+  </div>
+</div>

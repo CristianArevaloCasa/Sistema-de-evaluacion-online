@@ -154,7 +154,8 @@
   font-size: 14px;
 }
 
-.form-group input {
+.form-group input,
+.rol-select {
   padding: 12px 16px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
@@ -162,11 +163,17 @@
   transition: all 0.3s ease;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.rol-select:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
   transform: translateY(-2px);
+}
+
+.rol-select {
+  cursor: pointer;
+  background-color: white;
 }
 
 .form-group input.error {

@@ -25,14 +25,16 @@ export class LoginComponent {
   constructor() {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      rol: ['estudiante', [Validators.required]]
     });
 
     this.registerForm = this.fb.group({
       displayName: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
+      confirmPassword: ['', [Validators.required]],
+      rol: ['estudiante', [Validators.required]]
     });
   }
 
@@ -51,9 +53,15 @@ export class LoginComponent {
     this.errorMessage = '';
 
     try {
-      const { email, password } = this.loginForm.value;
+      const { email, password, rol } = this.loginForm.value;
       await this.authService.login(email, password);
-      this.router.navigate(['/evaluaciones']);
+      
+      // Redirigir según el rol seleccionado
+      if (rol === 'profesor') {
+        this.router.navigate(['/evaluaciones']);
+      } else {
+        this.router.navigate(['/evaluaciones-disponibles']);
+      }
     } catch (error: any) {
       this.errorMessage = this.getErrorMessage(error.code);
     } finally {
@@ -77,9 +85,15 @@ export class LoginComponent {
     this.errorMessage = '';
 
     try {
-      const { displayName, email, password } = this.registerForm.value;
+      const { displayName, email, password, rol } = this.registerForm.value;
       await this.authService.register(email, password, displayName);
-      this.router.navigate(['/evaluaciones']);
+      
+      // Redirigir según el rol seleccionado
+      if (rol === 'profesor') {
+        this.router.navigate(['/evaluaciones']);
+      } else {
+        this.router.navigate(['/evaluaciones-disponibles']);
+      }
     } catch (error: any) {
       this.errorMessage = this.getErrorMessage(error.code);
     } finally {

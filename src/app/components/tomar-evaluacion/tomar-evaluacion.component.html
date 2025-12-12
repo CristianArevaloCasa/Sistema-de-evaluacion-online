@@ -1,0 +1,96 @@
+<div class="evaluacion-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <p>Cargando evaluación...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!loading && errorMessage && !evaluacion" class="error-state">
+    <div class="error-icon">❌</div>
+    <h2>{{ errorMessage }}</h2>
+    <button class="btn btn-primary" (click)="volverAEvaluaciones()">
+      Volver a Evaluaciones
+    </button>
+  </div>
+
+  <!-- Formulario de Evaluación -->
+  <div *ngIf="!loading && evaluacion" class="evaluacion-content animate-fade-in">
+    <!-- Header -->
+    <div class="evaluacion-header">
+      <div class="header-info">
+        <h1>{{ evaluacion.titulo }}</h1>
+        <p class="descripcion">{{ evaluacion.descripcion }}</p>
+        <div class="info-badges">
+          <span class="badge badge-categoria">📚 {{ evaluacion.categoria }}</span>
+          <span class="badge badge-puntaje">⭐ {{ evaluacion.puntajeMaximo }} puntos</span>
+          <span class="badge badge-tiempo" [class.tiempo-critico]="tiempoRestante.includes('0h')">
+            ⏰ {{ tiempoRestante }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="respuestaForm" (ngSubmit)="enviarRespuestas()" class="respuesta-form">
+      <div formArrayName="respuestas" class="preguntas-container">
+        <div *ngFor="let respuesta of respuestas.controls; let i = index" 
+             [formGroupName]="i" 
+             class="pregunta-card animate-slide-up"
+             [style.animation-delay]="(i * 0.1) + 's'">
+          
+          <div class="pregunta-header">
+            <span class="pregunta-numero">Pregunta {{ i + 1 }}</span>
+            <span class="pregunta-puntaje">{{ evaluacion.preguntas[i].puntaje }} pts</span>
+          </div>
+
+          <div class="pregunta-texto">
+            {{ evaluacion.preguntas[i].texto }}
+          </div>
+
+          <!-- Tipo: Opción Múltiple -->
+          <div *ngIf="evaluacion.preguntas[i].tipo === 'opcion-multiple'" class="opciones-list">
+            <label *ngFor="let opcion of evaluacion.preguntas[i].opciones; let j = index" 
+                   class="opcion-item">
+              <input 
+                type="radio" 
+                [value]="opcion" 
+                formControlName="respuesta"
+                [id]="'pregunta-' + i + '-opcion-' + j">
+              <span class="opcion-label">{{ opcion }}</span>
+            </label>
+          </div>
+
+          <!-- Tipo: Abierta -->
+          <div *ngIf="evaluacion.preguntas[i].tipo === 'abierta'" class="respuesta-abierta">
+            <textarea 
+              formControlName="respuesta"
+              rows="4"
+              placeholder="Escribe tu respuesta aquí..."
+              [class.error]="respuesta.get('respuesta')?.invalid && respuesta.get('respuesta')?.touched">
+            </textarea>
+            <span class="error-message" 
+                  *ngIf="respuesta.get('respuesta')?.invalid && respuesta.get('respuesta')?.touched">
+              Esta pregunta es obligatoria
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje de Error -->
+      <div *ngIf="errorMessage" class="alert alert-error animate-shake">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="enviando">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="enviando || respuestaForm.invalid">
+          <span *ngIf="!enviando">📝 Enviar Respuestas</span>
+          <span *ngIf="enviando">Enviando...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
