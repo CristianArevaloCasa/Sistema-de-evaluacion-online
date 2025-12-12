@@ -1,8 +1,22 @@
 # Sistema de Evaluación Online
 
+## 🎓 Información Académica
+
+**Universidad:** Universidad Técnica de Ambato  
+**Facultad:** Facultad de Ingeniería en Sistemas, Electrónica e Industrial  
+**Carrera:** Ingeniería en Software  
+**Asignatura:** Computación en Internet III  
+**Docente:** Ing. Franklin Salazar  
+**Semestre:** Septiembre 2024 - Febrero 2025  
+
+**Integrante:**
+- Cristian Gonzalo Arévalo Casa
+
+---
+
 ## 📋 Descripción del Proyecto
 
-Sistema web para la gestión y creación de evaluaciones académicas online. Permite a los profesores crear, administrar y hacer seguimiento de evaluaciones con preguntas personalizables, control de estados y almacenamiento seguro en la nube.
+Sistema web para la gestión y creación de evaluaciones académicas online. Permite a los profesores crear, administrar y hacer seguimiento de evaluaciones con preguntas personalizables, control de estados y almacenamiento seguro en la nube. Los estudiantes pueden visualizar evaluaciones disponibles, tomarlas con control de tiempo y recibir calificación automática instantánea.
 
 ---
 
@@ -178,28 +192,32 @@ src/
 
 ## 🎥 Video Demostración
 
-**URL del Video:** [PENDIENTE - Agregar enlace del video]
+**URL del Video:** [Insertar enlace aquí]
 
-### Contenido del Video:
-1. **Funcionalidades principales** 
-   - Creación de evaluaciones
-   - Gestión de preguntas
-   - Filtros y búsqueda
-
-2. **Flujo de autenticación** 
-   - Registro de usuario
-   - Inicio de sesión
-   - Protección de rutas
-
-3. **Operaciones con Firestore** 
-   - Escritura de datos
-   - Lectura en tiempo real
-   - Actualización y eliminación
-
-4. **Explicación del código**
-   - Componentes principales
-   - Servicios de Firebase
-   - Guards de autenticación
+> **📹 Espacio reservado para el video demostrativo del sistema**
+> 
+> El video debe incluir:
+> 1. **Funcionalidades principales**
+>    - Vista de profesor: Creación y gestión de evaluaciones
+>    - Vista de estudiante: Tomar evaluaciones y ver resultados
+>    - Sistema de filtros y búsqueda
+> 
+> 2. **Flujo de autenticación**
+>    - Registro con selección de rol (Estudiante/Profesor)
+>    - Inicio de sesión
+>    - Protección de rutas con Guards
+> 
+> 3. **Operaciones con Firestore**
+>    - Escritura de datos (crear evaluaciones y respuestas)
+>    - Lectura en tiempo real
+>    - Actualización y eliminación
+>    - Reglas de seguridad
+> 
+> 4. **Explicación del código**
+>    - Componentes principales (profesor y estudiante)
+>    - Servicios de Firebase (AuthService, EvaluacionService)
+>    - Guards de autenticación
+>    - Sistema de calificación automática
 
 ---
 
@@ -365,15 +383,20 @@ ng deploy --base-href=https://CristianArevaloCasa.github.io/Sistema-de-evaluacio
 
 ---
 
-## 📝 Licencia
-
-Este proyecto es de uso académico.
-
 ---
 
 ## 👤 Autor
 
-**Cristian Arevalo Casa**
+**Cristian Gonzalo Arévalo Casa**
 
 - GitHub: [@CristianArevaloCasa](https://github.com/CristianArevaloCasa)
 - Repositorio: [Sistema-de-evaluacion-online](https://github.com/CristianArevaloCasa/Sistema-de-evaluacion-online)
+- Universidad Técnica de Ambato
+- Carrera: Ingeniería en Software
+
+---
+
+## 📝 Licencia
+
+Este proyecto es de uso académico desarrollado para la asignatura de Computación en Internet III.
+
