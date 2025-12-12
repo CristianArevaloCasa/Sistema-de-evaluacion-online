@@ -5,11 +5,14 @@ service cloud.firestore {
     
     // Reglas para la colección de evaluaciones
     match /evaluaciones/{evaluacionId} {
-      // Permitir leer evaluaciones del usuario autenticado (usando get para comparar)
+      // Permitir leer evaluaciones activas a cualquier usuario autenticado
+      // o evaluaciones propias
       allow read: if request.auth != null && 
-                     (resource == null || resource.data.userId == request.auth.uid);
+                     (resource == null || 
+                      resource.data.estado == 'activa' || 
+                      resource.data.userId == request.auth.uid);
       
-      // Permitir listar evaluaciones del usuario autenticado
+      // Permitir listar evaluaciones si el usuario está autenticado
       allow list: if request.auth != null;
       
       // Permitir crear evaluaciones si el usuario está autenticado
@@ -27,13 +30,13 @@ service cloud.firestore {
       allow read: if request.auth != null;
       
       // Permitir crear respuestas si el usuario está autenticado
-      allow create: if request.auth != null && request.resource.data.estudianteId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       
       // Permitir actualizar respuestas propias
-      allow update: if request.auth != null && resource.data.estudianteId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
       
       // Solo el propietario puede eliminar
-      allow delete: if request.auth != null && resource.data.estudianteId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
   }
 }
