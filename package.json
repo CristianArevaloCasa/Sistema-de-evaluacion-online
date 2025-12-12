@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:gh": "ng build --base-href=/Sistema-de-evaluacion-online/",
+    "deploy:gh": "npm run build:gh && npx angular-cli-ghpages --dir=dist/Sistema_de_evaluacion_online/browser"
   },
   "prettier": {
     "printWidth": 100,
