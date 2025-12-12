@@ -152,10 +152,11 @@ export class TomarEvaluacionComponent implements OnInit {
         clearInterval(this.intervalo);
       }
 
-      // Navegar a resultado
-      this.router.navigate(['/resultado-evaluacion', this.evaluacionId], {
-        queryParams: { puntaje: puntajeObtenido, maximo: this.evaluacion.puntajeMaximo }
-      });
+      // Mostrar mensaje de éxito
+      alert('✅ ¡Respuestas enviadas exitosamente!\n\nTu evaluación ha sido guardada correctamente.');
+
+      // Redirigir a evaluaciones disponibles
+      this.router.navigate(['/evaluaciones-disponibles']);
     } catch (error) {
       console.error('Error al enviar respuestas:', error);
       this.errorMessage = 'Error al enviar las respuestas. Intenta de nuevo.';
