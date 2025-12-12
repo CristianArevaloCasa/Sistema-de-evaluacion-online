@@ -2,15 +2,15 @@
 
 ## 🎓 Información Académica
 
-**Universidad:** Universidad Técnica de Ambato  
-**Facultad:** Facultad de Ingeniería en Sistemas, Electrónica e Industrial  
-**Carrera:** Ingeniería en Software  
-**Asignatura:** Computación en Internet III  
-**Docente:** Ing. Franklin Salazar  
-**Semestre:** Septiembre 2024 - Febrero 2025  
+**Universidad:** Universidad Nacional Jose Maria Arguedas
+**Facultad:** Facultad de Ingeniería de Sistemas
+**Carrera:** Ingeniería de Sistemas
+**Asignatura:** Programacion web
+**Docente:** Ing. Ivan Soria Solis
+**Semestre:** VI siclo
 
 **Integrante:**
-- Cristian Gonzalo Arévalo Casa
+- Cristian Arévalo Casa
 
 ---
 
@@ -192,9 +192,7 @@ src/
 
 ## 🎥 Video Demostración
 
-**URL del Video:** [Insertar enlace aquí]
-
-> **📹 Espacio reservado para el video demostrativo del sistema**
+**URL del Video:** [https://drive.google.com/file/d/1Z8Ced32l7g-3SMqQ0cEpg1xLVp-xt1f1/view?usp=drive_link]
 > 
 > El video debe incluir:
 > 1. **Funcionalidades principales**
@@ -387,16 +385,16 @@ ng deploy --base-href=https://CristianArevaloCasa.github.io/Sistema-de-evaluacio
 
 ## 👤 Autor
 
-**Cristian Gonzalo Arévalo Casa**
+**Cristian Arévalo Casa**
 
 - GitHub: [@CristianArevaloCasa](https://github.com/CristianArevaloCasa)
 - Repositorio: [Sistema-de-evaluacion-online](https://github.com/CristianArevaloCasa/Sistema-de-evaluacion-online)
-- Universidad Técnica de Ambato
-- Carrera: Ingeniería en Software
+- Universidad Nacional Jose Maria Areguedas
+- Carrera: Ingeniería de Sistemas 
 
 ---
 
 ## 📝 Licencia
 
-Este proyecto es de uso académico desarrollado para la asignatura de Computación en Internet III.
+Este proyecto es de uso académico desarrollado para la asignatura de Programacion web.
 
