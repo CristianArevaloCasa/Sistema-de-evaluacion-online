@@ -26,8 +26,8 @@ export const loginGuard = () => {
   return authService.getUser().pipe(
     map(user => {
       if (user) {
-        router.navigate(['/evaluaciones']);
-        return false;
+        // No redirigir automáticamente, dejar que el usuario elija su rol
+        return true;
       } else {
         return true;
       }
